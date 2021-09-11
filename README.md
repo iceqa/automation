@@ -11,10 +11,13 @@ python -m virtualenv venv
 source venv/bin/activate
 pip install pytest
 ```
-### 3. Update JWT in the project.
+### 3. Update JWT in the project
 ```
-3.1. Generate JWT from https://developer.nexmo.com/jwt.
-3.2. Add JWT to "JWT" variable in https://github.com/iceqa/automation/blob/84a5650390d6bc1994fcc5d577e982b7abaf66ee/config/config.py#L9 
+pip install pytest-dotenv
+add _env file to root of your project
+add a variable with name "JWT"
+go to https://developer.nexmo.com/jwt and generate JWT token
+open _env file and add generated token to "JWT" variable
 ```
 ## Run tests
 ```
