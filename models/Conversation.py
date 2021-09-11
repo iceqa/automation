@@ -2,6 +2,7 @@
 import requests
 from config import config
 from helpers.Headers import get_header
+from helpers.ResponseHandler import get_formatted_response
 
 
 class Conversation:
@@ -9,6 +10,34 @@ class Conversation:
     def __init__(self):
         self.base_url = config.API_URL
         self.token = config.JWT
+
+    @staticmethod
+    def get_conversation_id(response):
+        return get_formatted_response(response)['id']
+
+    @staticmethod
+    def get_conversation_uuid(response):
+        return get_formatted_response(response)['uuid']
+
+    @staticmethod
+    def get_conversation_href(response):
+        return get_formatted_response(response)['href']
+
+    @staticmethod
+    def get_conversation_name(response):
+        return get_formatted_response(response)['name']
+
+    @staticmethod
+    def get_conversation_creation_date(response):
+        return get_formatted_response(response)['timestamp']['created']
+
+    @staticmethod
+    def get_conversation_update_date(response):
+        return get_formatted_response(response)['timestamp']['updated']
+
+    @staticmethod
+    def get_conversation_destroyed_date(response):
+        return get_formatted_response(response)['timestamp']['destroyed']
 
     def get_conversation_list(self):
         """function to get all conversations."""
