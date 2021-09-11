@@ -5,7 +5,7 @@ from models.helpers.Headers import get_header
 
 
 class Conversation:
-
+    """Conversation entity methods to work with it's API."""
     def __init__(self):
         self.base_url = config.API_URL
         self.token = config.JWT
