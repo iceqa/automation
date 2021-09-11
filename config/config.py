@@ -1,9 +1,11 @@
 """config with access data"""
 
 
-api_url = "https://api.nexmo.com"
+# URLs
+API_URL = "https://api.nexmo.com"
 
 
+# JSON Web Token to work with APIs.
 JWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9" \
       ".eyJpYXQiOjE2MzEzNjE5MjYsImV4cCI6MTY" \
       "zMTg4MDMyNiwianRpIjoiNlRWcDRmdTRBamw" \
