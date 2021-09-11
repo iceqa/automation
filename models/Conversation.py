@@ -1,7 +1,7 @@
 """conversation model with API to conversation entity."""
 import requests
 from config import config
-from models.helpers.Headers import get_header
+from helpers.Headers import get_header
 
 
 class Conversation:
