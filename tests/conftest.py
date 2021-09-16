@@ -4,7 +4,7 @@ from models.Conversation import Conversation
 
 
 @pytest.fixture
-def get_conversations_object():
+def get_conversations():
     conversations_list = Conversation().get_conversation_list()
     return conversations_list
 
