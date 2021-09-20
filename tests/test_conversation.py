@@ -3,6 +3,8 @@ import pytest
 from helpers.DataGenerators import get_str_with_length, get_current_time_without_tzinfo
 from helpers.ResponseHandler import get_formatted_response
 from models.Conversation import Conversation
+from responseTemplates import ConversationApiResponse
+from responseTemplates.ResponseChecker import validate_json_response
 
 
 class TestGetConversations:
@@ -17,6 +19,8 @@ class TestGetConversations:
         conversations_list_response_obj = get_conversations
         formatted_conversations_list = get_formatted_response(conversations_list_response_obj)
         conversations_count = formatted_conversations_list['count']
+        assert validate_json_response(schema=ConversationApiResponse.LIST_CONVERSATION_JSON,
+                                      val=get_conversations.json()) == True, f"Error: {get_conversations.json()}"
         assert conversations_list_response_obj.status_code == expected_response_status_code
         assert conversations_count == expected_number_of_conversations
 
