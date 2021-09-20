@@ -25,19 +25,16 @@ class TestsCreateConversation:
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code',
                              [
-                                 ['conv-{}'.format(get_current_time_without_tzinfo()), "happy pass case", "https://demo.img",
-                                  60, 200],
-                                 ["some super conversation", "dp-{}".format(get_current_time_without_tzinfo()), "https://demo.img",
-                                  60, 200],
-                                 ["{}".format(get_str_with_length(255)), "disp name3", "https://demo.img",
-                                  10, 200],
-                                 ["conv with google link", "gogole disp name", "https://google.com", 60, 200],
-                                 ["conv with http link", "http disp name", "http://google.com", 60, 200],
-                                 ["conv with big ttl", "bit ttl disp name", "https://google.com", 86400, 200],
-                                 ["name-long1", "dn-{}".format(get_str_with_length(255)), "https://demo.img",
-                                  10, 200],
-                                 ["name-{}".format(get_str_with_length(255)), "disp name3", "https://demo.img",
-                                  10, 200],
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), "happy pass case",
+                                  "https://demo.img", 60, 200],
+                                 [get_str_with_length(10), "dp-{}".format(get_current_time_without_tzinfo()),
+                                  "https://demo.img", 60, 200],
+                                 ["{}".format(get_str_with_length(255)), "disp name3", "https://demo.img", 10, 200],
+                                 [get_str_with_length(10), "gogole disp name", "https://google.com", 60, 200],
+                                 [get_str_with_length(10), "http disp name", "http://google.com", 60, 200],
+                                 [get_str_with_length(10), "bit ttl disp name", "https://google.com", 86400, 200],
+                                 [get_str_with_length(10), "dn-{}".format(get_str_with_length(255)), "https://demo.img", 10, 200],
+                                 [get_str_with_length(255), "disp name3", "https://demo.img", 10, 200],
 
                              ])
     def test_create_conversation_with_positive_values_and_check_status_code(self, get_new_conversation, name,
@@ -48,22 +45,20 @@ class TestsCreateConversation:
                                                                                        "conversation response " \
                                                                                        "status code mismatches"
 
-    conv_name_with_current_date = 'conv-{}'.format(get_current_time_without_tzinfo())
+    conv_name = get_str_with_length(10)
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code',
                              [
-                                 [conv_name_with_current_date, "conv-name negative case", "https://demo.img",
-                                  60, 200],
-                                 [conv_name_with_current_date, "conv-name negative case", "https://demo.img",
-                                  60, 400],
+                                 [conv_name, "conv-name negative case", "https://demo.img", 60, 200],
+                                 [conv_name, "conv-name negative case", "https://demo.img", 60, 400],
                                  ["name-{}".format(get_str_with_length(5000)), "disp name3", "https://demo.img",
                                   10, 413],
                                  ["name-long1", "dn-{}".format(get_str_with_length(4000)), "https://demo.img",
                                   10, 413],
-                                 [{}, "gogole disp name", "https://google.com", 10, 400],
-                                 ["conv with http link", "", "http://google.com", 10, 400],
-                                 ["conv with big ttl", "bit ttl disp name", {}, 1, 400],
-                                 ["conv with big ttl", "bit ttl disp name", "http://google.com", "", 400],
+                                 [{}, get_str_with_length(10), "https://google.com", 10, 400],
+                                 [get_str_with_length(10), "", "http://google.com", 10, 400],
+                                 [get_str_with_length(10), "bit ttl disp name", {}, 1, 400],
+                                 [get_str_with_length(10), "bit ttl disp name", "http://google.com", "", 400],
                                  ["", "", "", {}, 400],
                                  [{}, {}, {}, {}, 400],
                                  ["", "", "", "", 400]
