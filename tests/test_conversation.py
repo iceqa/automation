@@ -144,3 +144,23 @@ class TestUpdateConversation:
         conversation_date_update = Conversation().get_conversation_update_date(object_of_updated_conversation)
         assert updated_conv_name == new_conv_name
         assert updated_conv_display_name == new_display_name
+        assert conversation_date_create != conversation_date_update
+
+
+class TestRetrieveConversation:
+
+    @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, expected_name',
+                             [
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
+                                  3600, 200,
+                                  'conv-{}'.format(get_current_time_without_tzinfo())]
+                             ])
+    def test_get_conversation_by_id(self, get_new_conversation, name, display_name, image_url, ttl,
+                                    expected_response_status_code, expected_name):
+        conversation_response_obj = get_new_conversation
+        assert conversation_response_obj.status_code == expected_response_status_code
+        conversation_id = Conversation().get_conversation_id(conversation_response_obj)
+        received_conversation_object_by_id = Conversation().get_conversation_by_id(conversation_id)
+        conversation_name = Conversation().get_conversation_name(received_conversation_object_by_id)
+        assert received_conversation_object_by_id.status_code == expected_response_status_code
+        assert conversation_name == expected_name
