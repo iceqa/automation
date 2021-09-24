@@ -164,3 +164,22 @@ class TestRetrieveConversation:
         conversation_name = Conversation().get_conversation_name(received_conversation_object_by_id)
         assert received_conversation_object_by_id.status_code == expected_response_status_code
         assert conversation_name == expected_name
+
+
+class TestRecordConversation:
+
+    @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, event_url, '
+                             'event_method, split, audio_format, expected_name',
+                              [
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), "disp name", "https://demo.img",
+                                  60, 204, "test event", "POST", "conversation", "mp3",
+                                  'conv-{}'.format(get_current_time_without_tzinfo())]
+                             ])
+    def test_start_recording_a_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
+                                            expected_response_status_code, event_url, event_method, split, audio_format,
+                                            expected_name):
+        conversation_response_obj = get_new_conversation
+        conversation_id = get_formatted_response(conversation_response_obj)['id']
+        record_conversation = Conversation().record_conversation(conversation_id, event_url, event_method, split,
+                                                                 audio_format)
+        assert record_conversation.status_code == expected_response_status_code
