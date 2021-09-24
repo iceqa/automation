@@ -1,7 +1,10 @@
+import random
+
 import pytest
 
+from config.config import API_URL
 from helpers.DataGenerators import get_str_with_length, get_current_time_without_tzinfo
-from helpers.ResponseHandler import get_formatted_response
+from helpers.ResponseHandler import get_formatted_response, get_data_from_response
 from models.Conversation import Conversation
 
 
@@ -112,3 +115,30 @@ class TestsCreateConversation:
         conversation_name = get_formatted_response(conversation_object)['name']
         assert conversation_response_obj.status_code == expected_response_status_code
         assert conversation_name == expected_name
+
+
+class TestUpdateConversation:
+
+    new_conversation_name = 'updated conv name {}'.format(random.randrange(1000000, 9999999))
+
+    @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, new_conv_name, '
+                             'new_display_name, new_image_url, new_ttl',
+                             [
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
+                                  3600, 200, new_conversation_name, 'new disp name', 'https://google.com', 60]
+                             ])
+    def test_update_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
+                                 expected_response_status_code, new_conv_name, new_display_name, new_image_url, new_ttl):
+        conversation_response_obj = get_new_conversation
+        conversation_id = Conversation().get_conversation_id(conversation_response_obj)
+        conversation_href = "{}/v0.1/conversations/{}".format(API_URL, conversation_id)
+        update_conversation = Conversation().update_conversation(
+            conversation_id, name=new_conv_name, display_name=new_display_name, image_url=new_image_url, ttl=new_ttl)
+        assert update_conversation.status_code == expected_response_status_code
+        assert Conversation().get_conversation_id(update_conversation) == conversation_id
+        assert get_formatted_response(update_conversation)['href'] == conversation_href
+        object_of_updated_conversation = Conversation().get_conversation_by_id(conversation_id)
+        updated_conv_name = Conversation().get_conversation_name(object_of_updated_conversation)
+        updated_conv_display_name = Conversation().get_conversation_display_name(object_of_updated_conversation)
+        assert updated_conv_name == new_conv_name
+        assert updated_conv_display_name == new_display_name
