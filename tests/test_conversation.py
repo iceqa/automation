@@ -140,5 +140,7 @@ class TestUpdateConversation:
         object_of_updated_conversation = Conversation().get_conversation_by_id(conversation_id)
         updated_conv_name = Conversation().get_conversation_name(object_of_updated_conversation)
         updated_conv_display_name = Conversation().get_conversation_display_name(object_of_updated_conversation)
+        conversation_date_create = Conversation().get_conversation_creation_date(object_of_updated_conversation)
+        conversation_date_update = Conversation().get_conversation_update_date(object_of_updated_conversation)
         assert updated_conv_name == new_conv_name
         assert updated_conv_display_name == new_display_name
