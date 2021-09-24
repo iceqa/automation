@@ -183,3 +183,22 @@ class TestRecordConversation:
         record_conversation = Conversation().record_conversation(conversation_id, event_url, event_method, split,
                                                                  audio_format)
         assert record_conversation.status_code == expected_response_status_code
+
+
+class TestDeleteConversation:
+
+    @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, expected_name',
+                             [
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
+                                  3600, 200,
+                                  'conv-{}'.format(get_current_time_without_tzinfo())]
+                             ])
+    def test_delete_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
+                                 expected_response_status_code, expected_name):
+        conversation_response_obj = get_new_conversation
+        assert conversation_response_obj.status_code == 200, "conversation is not created."
+        conversation_id = Conversation().get_conversation_id(conversation_response_obj)
+        delete_conversation = Conversation().delete_conversation(conversation_id)
+        assert delete_conversation.status_code == expected_response_status_code
+        assert delete_conversation.json() == {}
+        assert Conversation().get_conversation_by_id(conversation_id).status_code == 404
