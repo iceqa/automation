@@ -4,7 +4,7 @@ import pytest
 
 from config.config import API_URL
 from helpers.DataGenerators import get_str_with_length, get_current_time_without_tzinfo
-from helpers.ResponseHandler import get_formatted_response, get_data_from_response
+from helpers.ResponseHandler import get_formatted_response
 from models.Conversation import Conversation
 
 
@@ -20,17 +20,21 @@ class TestGetConversations:
         conversations_list_response_obj = get_conversations
         formatted_conversations_list = get_formatted_response(conversations_list_response_obj)
         conversations_count = formatted_conversations_list['count']
-        assert conversations_list_response_obj.status_code == expected_response_status_code
-        assert conversations_count == expected_number_of_conversations
+        assert conversations_list_response_obj.status_code == expected_response_status_code, "Status code mismatches" \
+                                                                                             " with expected"
+        assert conversations_count == expected_number_of_conversations, "Conversation count number mismatches with" \
+                                                                        " expected"
 
 
 class TestsCreateConversation:
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code',
                              [
-                                 ['conv-{}'.format(get_current_time_without_tzinfo()), "happy pass case", "https://demo.img",
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), "happy pass case",
+                                  "https://demo.img",
                                   60, 200],
-                                 ["some super conversation", "dp-{}".format(get_current_time_without_tzinfo()), "https://demo.img",
+                                 ["some super conversation", "dp-{}".format(get_current_time_without_tzinfo()),
+                                  "https://demo.img",
                                   60, 200],
                                  ["{}".format(get_str_with_length(255)), "disp name3", "https://demo.img",
                                   10, 200],
@@ -91,6 +95,7 @@ class TestsCreateConversation:
     def test_create_conversation_and_verify_data(self, get_new_conversation, name, display_name, image_url, ttl,
                                                  expected_response_status_code, expected_name, expected_creation_date):
         conversation_response_obj = get_new_conversation
+        assert conversation_response_obj.status_code == 200, "Conversation is not created."
         conversation_id = get_formatted_response(conversation_response_obj)['id']
         conversation_object = Conversation().get_conversation_by_id(conversation_id)
         conversation_json = get_formatted_response(conversation_object)
@@ -98,27 +103,28 @@ class TestsCreateConversation:
         conversation_display_name = conversation_json['display_name']
         conversation_created_date = (conversation_json['timestamp']['created'])[:16]
         assert conversation_response_obj.status_code == expected_response_status_code, "Wrong status code"
-        assert conversation_name == expected_name, "conversation name mismatch to input"
-        assert conversation_display_name == display_name, "display name mismatch to input"
-        assert conversation_created_date == expected_creation_date, "conversation create date mismatch"
+        assert conversation_name == expected_name, "Conversation name mismatches to expected name"
+        assert conversation_display_name == display_name, "Conversation display name mismatches to expected"
+        assert conversation_created_date == expected_creation_date, "Conversation creation and update date are similar."
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, expected_name',
                              [
-                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img", 3600, 200,
+                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
+                                  3600, 200,
                                   'conv-{}'.format(get_current_time_without_tzinfo())]
                              ])
     def test_create_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
                                  expected_response_status_code, expected_name):
         conversation_response_obj = get_new_conversation
+        assert conversation_response_obj.status_code == 200, "Conversation is not created."
         conversation_id = get_formatted_response(conversation_response_obj)['id']
         conversation_object = Conversation().get_conversation_by_id(conversation_id)
+        assert conversation_object.status_code == expected_response_status_code, "Can't get conversation by id."
         conversation_name = get_formatted_response(conversation_object)['name']
-        assert conversation_response_obj.status_code == expected_response_status_code
-        assert conversation_name == expected_name
+        assert conversation_name == expected_name, "Conversation name mismatches with expected."
 
 
 class TestUpdateConversation:
-
     new_conversation_name = 'updated conv name {}'.format(random.randrange(1000000, 9999999))
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, new_conv_name, '
@@ -128,23 +134,26 @@ class TestUpdateConversation:
                                   3600, 200, new_conversation_name, 'new disp name', 'https://google.com', 60]
                              ])
     def test_update_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
-                                 expected_response_status_code, new_conv_name, new_display_name, new_image_url, new_ttl):
+                                 expected_response_status_code, new_conv_name, new_display_name, new_image_url,
+                                 new_ttl):
         conversation_response_obj = get_new_conversation
+        assert conversation_response_obj.status_code == 200, "Conversation is not created."
         conversation_id = Conversation().get_conversation_id(conversation_response_obj)
         conversation_href = "{}/v0.1/conversations/{}".format(API_URL, conversation_id)
         update_conversation = Conversation().update_conversation(
             conversation_id, name=new_conv_name, display_name=new_display_name, image_url=new_image_url, ttl=new_ttl)
-        assert update_conversation.status_code == expected_response_status_code
-        assert Conversation().get_conversation_id(update_conversation) == conversation_id
-        assert get_formatted_response(update_conversation)['href'] == conversation_href
+        assert update_conversation.status_code == expected_response_status_code, "Conversation is not updated."
+        assert Conversation().get_conversation_id(update_conversation) == conversation_id, "Can't get conversation " \
+                                                                                           "by id"
+        assert get_formatted_response(update_conversation)['href'] == conversation_href, "Conversation href mismatches"
         object_of_updated_conversation = Conversation().get_conversation_by_id(conversation_id)
         updated_conv_name = Conversation().get_conversation_name(object_of_updated_conversation)
         updated_conv_display_name = Conversation().get_conversation_display_name(object_of_updated_conversation)
         conversation_date_create = Conversation().get_conversation_creation_date(object_of_updated_conversation)
         conversation_date_update = Conversation().get_conversation_update_date(object_of_updated_conversation)
-        assert updated_conv_name == new_conv_name
-        assert updated_conv_display_name == new_display_name
-        assert conversation_date_create != conversation_date_update
+        assert updated_conv_name == new_conv_name, "Conversation name mismatches expected."
+        assert updated_conv_display_name == new_display_name, "Conversation display name mismatches expected."
+        assert conversation_date_create != conversation_date_update, "Conversation create and update dates are similar."
 
 
 class TestRetrieveConversation:
@@ -158,19 +167,21 @@ class TestRetrieveConversation:
     def test_get_conversation_by_id(self, get_new_conversation, name, display_name, image_url, ttl,
                                     expected_response_status_code, expected_name):
         conversation_response_obj = get_new_conversation
-        assert conversation_response_obj.status_code == expected_response_status_code
+        assert conversation_response_obj.status_code == expected_response_status_code, "conversation is not created."
         conversation_id = Conversation().get_conversation_id(conversation_response_obj)
         received_conversation_object_by_id = Conversation().get_conversation_by_id(conversation_id)
         conversation_name = Conversation().get_conversation_name(received_conversation_object_by_id)
-        assert received_conversation_object_by_id.status_code == expected_response_status_code
-        assert conversation_name == expected_name
+        assert received_conversation_object_by_id.status_code == expected_response_status_code, "Get conversation by " \
+                                                                                                "id status code " \
+                                                                                                "mismatches."
+        assert conversation_name == expected_name, "Conversation name is wrong."
 
 
 class TestRecordConversation:
 
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, event_url, '
                              'event_method, split, audio_format, expected_name',
-                              [
+                             [
                                  ['conv-{}'.format(get_current_time_without_tzinfo()), "disp name", "https://demo.img",
                                   60, 204, "test event", "POST", "conversation", "mp3",
                                   'conv-{}'.format(get_current_time_without_tzinfo())]
@@ -182,23 +193,23 @@ class TestRecordConversation:
         conversation_id = get_formatted_response(conversation_response_obj)['id']
         record_conversation = Conversation().record_conversation(conversation_id, event_url, event_method, split,
                                                                  audio_format)
-        assert record_conversation.status_code == expected_response_status_code
+        assert record_conversation.status_code == expected_response_status_code, "Something went wrong with " \
+                                                                                 "recording a conversation."
 
 
 class TestDeleteConversation:
 
-    @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, expected_name',
+    @pytest.mark.parametrize('name, display_name, image_url, ttl',
                              [
                                  ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
-                                  3600, 200,
-                                  'conv-{}'.format(get_current_time_without_tzinfo())]
+                                  10]
                              ])
-    def test_delete_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
-                                 expected_response_status_code, expected_name):
+    def test_delete_conversation(self, get_new_conversation, name, display_name, image_url, ttl):
         conversation_response_obj = get_new_conversation
         assert conversation_response_obj.status_code == 200, "conversation is not created."
         conversation_id = Conversation().get_conversation_id(conversation_response_obj)
         delete_conversation = Conversation().delete_conversation(conversation_id)
-        assert delete_conversation.status_code == expected_response_status_code
-        assert delete_conversation.json() == {}
-        assert Conversation().get_conversation_by_id(conversation_id).status_code == 404
+        assert delete_conversation.status_code == 200, "Delete conversation status code is wrong."
+        assert delete_conversation.json() == {}, "Delete conversation response is not empty."
+        assert Conversation().get_conversation_by_id(conversation_id).status_code == 404, "Deleted conversation " \
+                                                                                          "still exists."
