@@ -1,4 +1,4 @@
-from trafaret import String, Int, URL, Bool, Or, Date, Float
+from trafaret import String, Int, URL, Bool, Or, Date, Float, Type, Dict, Null
 
 LIST_CONVERSATION_JSON = {
   "count": Or(Int, Float),
@@ -36,13 +36,13 @@ UPDATE_CONVERSATION_JSON = {
 }
 
 GET_CONVERSATION_JSON = {
-  "uuid": String,
-  "name": String,
-  "numbers": {},
+  "uuid": str,
+  "name": str,
+  "numbers": object,
   "properties": {
-    "video": Bool
+    "video": bool
   },
-  "display_name": String,
+  "display_name": str,
   "timestamp": {
     "created": Date,
     "updated": Date,
