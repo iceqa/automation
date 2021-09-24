@@ -28,6 +28,10 @@ class Conversation:
         return get_formatted_response(response)['name']
 
     @staticmethod
+    def get_conversation_display_name(response):
+        return get_formatted_response(response)['display_name']
+
+    @staticmethod
     def get_conversation_creation_date(response):
         return get_formatted_response(response)['timestamp']['created']
 
