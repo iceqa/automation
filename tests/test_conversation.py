@@ -98,11 +98,12 @@ class TestsCreateConversation:
         assert conversation_display_name == display_name, "display name mismatch to input"
         assert conversation_created_date == expected_creation_date, "conversation create date mismatch"
 
+    conv_name = get_str_with_length(10)
+
     @pytest.mark.parametrize('name, display_name, image_url, ttl, expected_response_status_code, expected_name',
                              [
-                                 ['conv-{}'.format(get_current_time_without_tzinfo()), 'disp name', "https://demo.img",
-                                  3600, 200,
-                                  'conv-{}'.format(get_current_time_without_tzinfo())]
+                                 ['conv-{}'.format(conv_name), 'disp name', "https://demo.img", 1, 200,
+                                  'conv-{}'.format(conv_name)]
                              ])
     def test_create_conversation(self, get_new_conversation, name, display_name, image_url, ttl,
                                  expected_response_status_code, expected_name):
